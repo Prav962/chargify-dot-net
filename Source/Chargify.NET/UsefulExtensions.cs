@@ -606,6 +606,16 @@
             }
             return result;
         }
+        public static ComponentLineItem GetNodeContentAsComponentLineItem(this XmlNode node)
+        {
+            ComponentLineItem result = null;
+            if (node.FirstChild != null)
+            {
+                result = new ComponentLineItem(node);
+            }
+            return result;
+        }
+        
 
         /// <summary>
         /// Generic node convert method
@@ -656,6 +666,26 @@
             return renewalLineItems;
         }
 
+        public static List<ComponentLineItem> GetJSONContentAsComponentLineItems(this JsonObject obj, string key)
+        {
+            var componentLineItems = new List<ComponentLineItem>();
+            var componentLineItemsArray = obj[key] as JsonArray;
+            if (componentLineItemsArray != null)
+            {
+                foreach (var jsonValue in componentLineItemsArray.Items)
+                {
+                    var componentLineItem = (JsonObject)jsonValue;
+                    componentLineItems.Add(new ComponentLineItem(componentLineItem));
+                }
+            }
+            // Sanity check, should be equal.
+            if (componentLineItemsArray != null && componentLineItemsArray.Length != componentLineItems.Count)
+            {
+                throw new JsonParseException(string.Format("Unable to parse public signup pages ({0} != {1})", componentLineItemsArray.Length, componentLineItems.Count));
+            }
+            return componentLineItems;
+        }
+
         /// <summary>
         /// Convert the XmlNode to a list of Renewal Line Items
         /// </summary>
@@ -670,6 +700,32 @@
                 {
                     case "line_item":
                         lineItems.Add(childNode.GetNodeContentAsRenewalLineItem());
+                        break;
+                }
+            }
+            // Sanity check, should be equal.
+            if (node.ChildNodes.Count != lineItems.Count)
+            {
+                throw new JsonParseException(string.Format("Unable to parse renewal line items ({0} != {1})", node.ChildNodes.Count, lineItems.Count));
+            }
+
+            return lineItems;
+        }
+
+        /// <summary>
+        /// Convert the XmlNode to a list of Renewal Line Items
+        /// </summary>
+        /// <param name="node">The xml node to convert</param>
+        /// <returns>The list result, or empty list otherwise</returns>
+        public static List<ComponentLineItem> GetNodeContentAsComponentLineItems(this XmlNode node)
+        {
+            var lineItems = new List<ComponentLineItem>();
+            foreach (XmlNode childNode in node.ChildNodes)
+            {
+                switch (childNode.Name)
+                {
+                    case "line_item":
+                        lineItems.Add(childNode.GetNodeContentAsComponentLineItem());
                         break;
                 }
             }

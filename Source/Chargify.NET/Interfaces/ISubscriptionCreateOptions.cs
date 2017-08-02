@@ -219,7 +219,7 @@ namespace ChargifyNET
         {
             return UnitBalance.HasValue;
         }
-        
+
         ///// <summary>
         ///// The scheme used if the proration was an upgrade. This is only present when the allocation was created mid-period.
         ///// </summary>

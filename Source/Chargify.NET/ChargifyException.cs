@@ -143,13 +143,32 @@ namespace ChargifyNET
                                 {
                                     for (int i = 0; i <= array.Length - 1; i++)
                                     {
-                                        if ((((JsonString) array.Items[i]) != null) && (!string.IsNullOrEmpty(((JsonString) array.Items[i]).Value)))
+                                        if (array.Items[i].GetType() == typeof(JsonString))
                                         {
-                                            JsonString errorStr = array.Items[i] as JsonString;
-                                            ChargifyError anError = new ChargifyError(errorStr);
-                                            if (!errors.Contains(anError))
+                                            if ((((JsonString)array.Items[i]) != null) && (!string.IsNullOrEmpty(((JsonString)array.Items[i]).Value)))
                                             {
-                                                errors.Add(anError);
+                                                JsonString errorStr = array.Items[i] as JsonString;
+                                                ChargifyError anError = new ChargifyError(errorStr);
+                                                if (!errors.Contains(anError))
+                                                {
+                                                    errors.Add(anError);
+                                                }
+                                            }
+                                        }
+                                        else if (array.Items[i].GetType() == typeof(JsonObject))
+                                        {
+                                            var jsonobj = ((JsonObject)array.Items[i]);
+                                            if (jsonobj != null)
+                                            {
+                                                var str = jsonobj.GetJSONContentAsString("message");
+                                                if (!string.IsNullOrEmpty(str))
+                                                {
+                                                    ChargifyError anError = new ChargifyError(new JsonString(str));
+                                                    if (!errors.Contains(anError))
+                                                    {
+                                                        errors.Add(anError);
+                                                    }
+                                                }
                                             }
                                         }
                                     }

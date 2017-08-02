@@ -12,14 +12,10 @@
     <AssemblyName>ChargifyNET</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -49,6 +45,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Debug\ChargifyNET.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -65,9 +62,8 @@
     <ApplicationIcon>wallet.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.8.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -90,18 +86,21 @@
     <Compile Include="ChargifyPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="ComponentAllocationPreview.cs" />
     <Compile Include="ComponentAllocation.cs" />
     <Compile Include="ComponentAttributes.cs" />
     <Compile Include="ComponentInfo.cs" />
     <Compile Include="Configuration\ChargifyAccountElement.cs" />
     <Compile Include="Configuration\ChargifyAccountElementCollection.cs" />
     <Compile Include="Configuration\ChargifyAccountRetrieverSection.cs" />
+    <Compile Include="CouponUsage.cs" />
     <Compile Include="Data\Controls\CountryDropDownList.cs" />
     <Compile Include="Coupon.cs" />
     <Compile Include="Credit.cs" />
     <Compile Include="CreditCardAttributes.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HttpRequestMethod.cs" />
+    <Compile Include="Interfaces\ICouponUsage.cs" />
     <Compile Include="Interfaces\IMetadata.cs" />
     <Compile Include="Interfaces\IMetadataResult.cs" />
     <Compile Include="Interfaces\INote.cs" />
@@ -204,7 +203,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Chargify.NET.nuspec" />
     <None Include="packages.config" />
     <None Include="web.config.transform" />
   </ItemGroup>

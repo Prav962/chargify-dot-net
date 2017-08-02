@@ -31,8 +31,12 @@
 // ReSharper disable once CheckNamespace
 namespace ChargifyNET
 {
+    using Json;
+    using Newtonsoft.Json;
     #region Imports
     using System;
+    using System.Collections.Generic;
+    using System.Xml;
     using System.Xml.Serialization;
     #endregion
 
@@ -140,5 +144,185 @@ namespace ChargifyNET
         /// The scheme used if the proration was a downgrade. This is only present when the allocation was created mid-period.
         /// </summary>
         ComponentDowngradeProrationScheme DowngradeScheme { get; set; }
+    }
+
+    public interface IComponentAllocationPreview
+    {
+        /// <summary>
+        /// The timestamp for the subscription’s next renewal
+        /// </summary>
+        [XmlElement("start_date"), JsonProperty("start_date")]
+        DateTime StartDate { get; }
+
+        /// <summary>
+        /// The timestamp for the subscription’s next renewal
+        /// </summary>
+        [XmlElement("end_date"), JsonProperty("end_date")]
+        DateTime EndDate { get; }
+
+        /// <summary>
+        /// An integer representing the amount of the total pre-tax, pre-discount charges that will be assessed at the next renewal
+        /// </summary>
+        [XmlElement("subtotal_in_cents"), JsonProperty("subtotal_in_cents")]
+        int SubtotalInCents { get; }
+
+        /// <summary>
+        /// An decimal representing the amount of the total pre-tax, pre-discount charges that will be assessed at the next renewal
+        /// </summary>
+        decimal Subtotal { get; }
+
+        /// <summary>
+        /// An integer representing the total tax charges that will be assessed at the next renewal
+        /// </summary>
+        [XmlElement("total_tax_in_cents"), JsonProperty("total_tax_in_cents")]
+        int TotalTaxInCents { get; }
+
+        /// <summary>
+        /// An decimal representing the total tax charges that will be assessed at the next renewal
+        /// </summary>
+        decimal TotalTax { get; }
+
+        /// <summary>
+        /// An integer representing the amount of the coupon discounts that will be applied to the next renewal
+        /// </summary>
+        [XmlElement("total_discount_in_cents"), JsonProperty("total_discount_in_cents")]
+        int TotalDiscountInCents { get; }
+
+        /// <summary>
+        /// An decimal representing the amount of the coupon discounts that will be applied to the next renewal
+        /// </summary>
+        decimal TotalDiscount { get; }
+
+        /// <summary>
+        /// An integer representing the total amount owed, less any discounts, that will be assessed at the next renewal
+        /// </summary>
+        [XmlElement("total_in_cents"), JsonProperty("total_in_cents")]
+        int TotalInCents { get; }
+
+        /// <summary>
+        /// An decimal representing the total amount owed, less any discounts, that will be assessed at the next renewal
+        /// </summary>
+        decimal Total { get; }
+
+        [XmlElement("direction"), JsonProperty("direction")]
+        string Direction { get;  }
+
+        [XmlElement("proration_scheme"), JsonProperty("proration_scheme")]
+        string ProrationScheme { get; }
+
+        /// <summary>
+        /// An array of <see cref="RenewalLineItem"/> representing the individual transactions that will be created at the next renewal
+        /// </summary>
+        [XmlArray("line_items")]
+        [XmlArrayItem("line_item", typeof(ComponentLineItem))]
+        [JsonProperty("line_items")]
+        List<ComponentLineItem> LineItems { get; }
+    }
+
+    /// <summary>
+    /// The line item included in a renewal preview response
+    /// </summary>
+    [XmlRoot("line_item")]
+    public class ComponentLineItem
+    {
+        #region Constructors
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public ComponentLineItem() { }
+
+        /// <summary>
+        /// Xml parsing constructor
+        /// </summary>
+        /// <param name="node"></param>
+        public ComponentLineItem(XmlNode node)
+        {
+            // Deserialize
+            var obj = node.ConvertNode<ComponentLineItem>();
+
+            TransactionType = obj.TransactionType;
+            Kind = obj.Kind;
+            AmountInCents = obj.AmountInCents;
+            Memo = obj.Memo;
+            DiscountAmountInCents = obj.DiscountAmountInCents;
+            TaxableAmountInCents = obj.TaxableAmountInCents;
+            ComponentId = obj.ComponentId;
+        }
+
+        /// <summary>
+        /// Json parsing constructor
+        /// </summary>
+        /// <param name="renewalLineItem"></param>
+        public ComponentLineItem(JsonObject renewalLineItem)
+        {
+            // Deserialize
+            var obj = JsonConvert.DeserializeObject<ComponentLineItem>(renewalLineItem.ToString());
+
+            TransactionType = obj.TransactionType;
+            Kind = obj.Kind;
+            AmountInCents = obj.AmountInCents;
+            Memo = obj.Memo;
+            DiscountAmountInCents = obj.DiscountAmountInCents;
+            TaxableAmountInCents = obj.TaxableAmountInCents;
+            ComponentId = obj.ComponentId;
+        }
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// The type of transaction
+        /// </summary>
+        [XmlElement("transaction_type"), JsonProperty("transaction_type")]
+        public string TransactionType { get; set; }
+
+        /// <summary>
+        /// The kind of transaction
+        /// </summary>
+        [XmlElement("kind"), JsonProperty("kind")]
+        public string Kind { get; set; }
+
+        /// <summary>
+        /// The amount of the transaction in cents
+        /// </summary>
+        [XmlElement("amount_in_cents"), JsonProperty("amount_in_cents")]
+        public int AmountInCents { get; set; }
+
+        /// <summary>
+        /// The amount of the transaction in dollars and cents
+        /// </summary>
+        public decimal Amount { get { return Convert.ToDecimal(AmountInCents) / 100; } }
+
+        /// <summary>
+        /// The memo of the transaction
+        /// </summary>
+        [XmlElement("memo"), JsonProperty("memo")]
+        public string Memo { get; set; }
+
+        /// <summary>
+        /// The discount amount in cents
+        /// </summary>
+        [XmlElement("discount_amount_in_cents"), JsonProperty("discount_amount_in_cents")]
+        public int DiscountAmountInCents { get; set; }
+
+        /// <summary>
+        /// The discount amount
+        /// </summary>
+        public decimal DiscountAmount { get { return Convert.ToDecimal(DiscountAmountInCents) / 100; } }
+
+        /// <summary>
+        /// The taxable amount in cents
+        /// </summary>
+        [XmlElement("taxable_amount_in_cents"), JsonProperty("taxable_amount_in_cents")]
+        public int TaxableAmountInCents { get; set; }
+
+        /// <summary>
+        /// The taxable amount
+        /// </summary>
+        public decimal TaxableAmount { get { return Convert.ToDecimal(TaxableAmountInCents) / 100; } }
+
+        [XmlElement("component_id"), JsonProperty("component_id")]
+        public int? ComponentId { get; set; }
+
+        #endregion
     }
 }
